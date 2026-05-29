@@ -7,28 +7,29 @@
 \usepackage{hyperref}
 
 \title{Finite-Field Edge Inference with GF(137) Kernels and Compact Virtual Gate Emulation}
-\author{I. Mikhailov}
+\author{I. Mikhailov\\
+\small Independent Researcher\\
+\small \href{https://doi.org/10.5281/zenodo.20436771}{doi:10.5281/zenodo.20436771}}
 \date{May 2026}
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Edge inference often trades numerical flexibility for latency, memory footprint,
-and implementation simplicity.  This work reports an experimental Python/C++
-stack in which dense neural-network operations are represented over the finite
-field-like residue ring $\mathbb{Z}/137\mathbb{Z}$ and executed by fused native
-kernels.  We store weights as unsigned-byte residues, fuse matrix
-multiplication, modular reduction, and threshold activation, and benchmark the
-result against float32 and JIT baselines on a small prime/composite
-classification task.  The compact C++/NEON throughput path stores the model in
-$1.63$ KB versus $6.50$ KB for the float32 baseline and runs $1000$ forward
-passes in $12.1$ ms, a $4.86\times$ speedup over the NumPy float32 baseline in
-the recorded benchmark.  We also describe a compact virtual quantum processor
-(VQP) toy emulator that stores $n$ virtual qubits as $26n$ byte-valued phase
-lanes rather than a $2^n$ complex state vector.  The VQP benchmark demonstrates
-large representation-level speedups, but it is not a physical quantum simulator
-and does not imply quantum advantage.
+Edge inference is frequently limited by memory traffic and runtime overhead
+rather than by parameter count alone.  This paper reports a small Python/C++
+prototype in which dense neural-network operations are represented over the
+residue ring $\mathbb{Z}/137\mathbb{Z}$ and executed by fused native kernels.
+Weights are stored as unsigned-byte residues, while matrix multiplication,
+modular reduction, and threshold activation are fused into a single execution
+path.  On a prime/composite classification benchmark, the compact C++/NEON
+throughput path stores the model in $1.63$ KB instead of $6.50$ KB for the
+float32 baseline and runs $1000$ forward passes in $12.1$ ms, corresponding to
+a $4.86\times$ speedup over the NumPy float32 baseline in the recorded run.  We
+also describe a compact virtual quantum processor (VQP) toy emulator that
+stores $n$ virtual qubits as $26n$ byte-valued phase lanes rather than as a
+$2^n$ complex state vector.  The VQP result is a representation-level systems
+benchmark, not a physical quantum-simulation result.
 \end{abstract}
 
 \section{Introduction}
@@ -39,7 +40,9 @@ standard responses to these constraints, but typical pipelines still retain
 floating-point calibration machinery or hardware-specific execution backends.
 This paper explores a deliberately small alternative: represent model weights
 and activations directly as residues in a fixed modulus and implement the whole
-forward path as a native fused kernel.
+forward path as a native fused kernel.  The baseline stack uses NumPy
+array programming \cite{numpy2020}, while optional JIT comparisons include JAX
+\cite{jax2018}.
 
 The work is experimental.  The goal is not to propose a new universal neural
 architecture, but to measure a concrete systems question: can a compact
@@ -87,9 +90,11 @@ It fuses three operations:
 The implementation uses:
 \begin{itemize}
     \item unsigned-byte storage for weights and activations;
-    \item integer accumulation with Barrett-style reduction modulo $137$;
+    \item integer accumulation with Barrett-style reduction modulo $137$
+    \cite{barrett1986};
     \item a persistent C++ worker pool to avoid per-forward thread creation;
-    \item an ARM NEON path for the benchmark shape with hidden width $H=32$;
+    \item an ARM NEON path \cite{armneon} for the benchmark shape with hidden
+    width $H=32$;
     \item a native repeated-call throughput mode that removes the Python/ctypes
     call boundary from the timed inner loop.
 \end{itemize}
@@ -151,10 +156,10 @@ The repository also contains a finite-field virtual gate emulator:
 \begin{center}
 \texttt{src/modular\_quantum/vqp\_core.cpp}.
 \end{center}
-The VQP layer is not a quantum simulator.  It does not store amplitudes, does
-not perform unitary evolution, and does not model quantum measurement
-probabilities.  It is a deterministic finite-field circuit emulator that uses
-the same compact residue representation.
+The VQP layer is a deterministic finite-field circuit emulator that uses the
+same compact residue representation.  Unlike a conventional state-vector
+quantum simulator, it does not store amplitudes, perform unitary evolution, or
+model quantum measurement probabilities.
 
 For $n$ virtual qubits, the VQP state uses
 \begin{equation}
@@ -175,7 +180,9 @@ The Hadamard-like gate uses the inverse of $2$ modulo $137$:
     2^{-1}\equiv69\pmod{137},
 \end{equation}
 and the CNOT-like gate applies a target update when a finite-field interaction
-hash exceeds the threshold $42$.
+hash exceeds the threshold $42$.  The Grover-style benchmark is therefore a toy
+search routine inspired by Grover's database-search algorithm
+\cite{grover1996}, not an implementation of the quantum algorithm itself.
 
 \section{VQP Results}
 
@@ -222,12 +229,11 @@ history, but it is not collected by the active test runner.
 \section{Limitations}
 
 The modular network accuracy is near chance on the prime/composite task, which
-is consistent with previous null audits of base-$e$ digit features.  The value
-of the work is therefore systems-level: compact storage, fused native
-execution, and a reproducible benchmark.  The VQP layer is a finite-field gate
-emulator only.  It is not an implementation of quantum mechanics, and it should
-not be used to claim quantum advantage or to replace complex-amplitude circuit
-simulation.
+is consistent with previous null audits of base-$e$ digit features.  The result
+should therefore be read as a systems measurement: compact storage, fused
+native execution, and a reproducible benchmark.  The VQP layer is a finite-field
+gate emulator only and should not be used as a replacement for
+complex-amplitude circuit simulation.
 
 \section{Conclusion}
 
@@ -245,23 +251,37 @@ quantum interpretations must remain deliberately limited.
 P. Barrett,
 ``Implementing the Rivest Shamir and Adleman Public Key Encryption Algorithm
 on a Standard Digital Signal Processor,''
-\emph{Advances in Cryptology -- CRYPTO'86}, 1986.
+\emph{Advances in Cryptology -- CRYPTO'86}, 311--323, 1986.
+doi: \href{https://doi.org/10.1007/3-540-47721-7_24}
+{10.1007/3-540-47721-7\_24}.
 
 \bibitem{grover1996}
 L. K. Grover,
 ``A Fast Quantum Mechanical Algorithm for Database Search,''
 \emph{Proceedings of the 28th Annual ACM Symposium on Theory of Computing},
-1996.
+212--219, 1996.
+doi: \href{https://doi.org/10.1145/237814.237866}
+{10.1145/237814.237866};
+arXiv: \href{https://arxiv.org/abs/quant-ph/9605043}{quant-ph/9605043}.
 
 \bibitem{numpy2020}
 C. R. Harris et al.,
 ``Array programming with NumPy,''
 \emph{Nature} \textbf{585}, 357--362 (2020).
+doi: \href{https://doi.org/10.1038/s41586-020-2649-2}
+{10.1038/s41586-020-2649-2}.
 
 \bibitem{jax2018}
 J. Bradbury et al.,
 ``JAX: composable transformations of Python+NumPy programs,''
-2018.
+software release, 2018.
+\url{https://github.com/google/jax}.
+
+\bibitem{armneon}
+Arm Ltd.,
+``Arm Neon Intrinsics Reference,''
+Arm C Language Extensions documentation.
+\url{https://arm-software.github.io/acle/neon_intrinsics/advsimd.html}.
 
 \end{thebibliography}
 
