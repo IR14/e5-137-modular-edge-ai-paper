@@ -12,7 +12,8 @@ runs `1000` forward passes in `12.1 ms`.
 
 ## Contents
 
-- `main.tex` — arXiv/Overleaf-ready LaTeX source.
+- `main.tex` — English arXiv/Overleaf-ready LaTeX source.
+- `main_ru.tex` — Russian LaTeX source for local review and Russian-language distribution.
 - `ARTIFACTS.md` — benchmark provenance and copied result tables.
 - `artifacts/cpp_kernel_benchmark.md` — GF(137) edge-inference benchmark.
 - `artifacts/virtual_quantum_processor_manifest.md` — compact VQP toy benchmark.
