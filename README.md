@@ -10,6 +10,12 @@ engineering result is a compact fused native kernel that reduces model memory
 from `6.50 KB` to `1.63 KB` and, in the recorded ARM NEON throughput benchmark,
 runs `1000` forward passes in `12.1 ms`.
 
+## DOI Records
+
+- Preprint DOI: [`10.5281/zenodo.20437242`](https://doi.org/10.5281/zenodo.20437242)
+- Software/reproducibility package DOI:
+  [`10.5281/zenodo.20436771`](https://doi.org/10.5281/zenodo.20436771)
+
 ## Contents
 
 - `main.tex` — English arXiv/Overleaf-ready LaTeX source.
@@ -44,6 +50,10 @@ pdflatex main_ru.tex
 The benchmark source code is maintained in:
 
 https://github.com/IR14/e5-137-modular-research-sandbox
+
+The archived preprint record is:
+
+https://doi.org/10.5281/zenodo.20437242
 
 ## Suggested Release Flow
 
