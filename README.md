@@ -14,6 +14,8 @@ runs `1000` forward passes in `12.1 ms`.
 
 - `main.tex` — English arXiv/Overleaf-ready LaTeX source.
 - `main_ru.tex` — Russian LaTeX source for local review and Russian-language distribution.
+- `e5_137_modular_edge_ai_paper.pdf` — compiled English PDF.
+- `e5_137_modular_edge_ai_paper_ru.pdf` — compiled Russian PDF.
 - `ARTIFACTS.md` — benchmark provenance and copied result tables.
 - `artifacts/cpp_kernel_benchmark.md` — GF(137) edge-inference benchmark.
 - `artifacts/virtual_quantum_processor_manifest.md` — compact VQP toy benchmark.
@@ -28,12 +30,15 @@ experiments.
 
 ## Build
 
-Upload `main.tex` to Overleaf, or compile locally if a TeX distribution is
-installed:
+The compiled PDFs are included for convenience. To rebuild from source, upload
+`main.tex` or `main_ru.tex` to Overleaf, or compile locally if a TeX
+distribution is installed:
 
 ```bash
 pdflatex main.tex
 pdflatex main.tex
+pdflatex main_ru.tex
+pdflatex main_ru.tex
 ```
 
 The benchmark source code is maintained in:
